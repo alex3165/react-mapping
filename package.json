@@ -1,0 +1,28 @@
+{
+  "name": "react-mapping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "clean": "rm -rf ./build",
+    "build": "tsc",
+    "build:watch": "tsc -w",
+    "prepublish": "npm run clean && npm run build",
+    "lint": "tslint 'src/**/*.{ts,tsx}'",
+    "prettify": "prettier --write src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/react": "^16.0.19",
+    "prettier": "^1.7.4",
+    "tslint": "^5.8.0",
+    "tslint-eslint-rules": "^4.1.1",
+    "tslint-microsoft-contrib": "^5.0.1",
+    "tslint-react": "^3.2.0",
+    "typescript": "^2.6.1"
+  },
+  "dependencies": {
+    "react": "^16.0.0"
+  }
+}
