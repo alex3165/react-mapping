@@ -1,15 +1,24 @@
 import * as React from 'react';
+import * as PropTypes from 'prop-types';
 
 export type Mode = 'edit' | 'view';
 
 export interface Props {
   mode?: Mode;
-  height: number;
-  width: number;
+  height: number | string;
+  width: number | string;
   style?: React.CSSProperties;
 }
 
 export class Editor extends React.Component<Props> {
+  public static childContextTypes = {
+    isEditMode: PropTypes.bool
+  };
+
+  public getChildContext = () => ({
+    isEditMode: this.props.mode === 'edit'
+  })
+
   render() {
     const {
       width,
@@ -20,14 +29,6 @@ export class Editor extends React.Component<Props> {
 
     return (
       <div style={{ ...style, width, height }}>
-        <div>
-          {
-            // TODO: Make it work for a single children
-            children &&
-            Array.isArray(children) &&
-            children.map((el, index) => <div key={index}/>)
-          }
-        </div>
         {children}
       </div>
     );
