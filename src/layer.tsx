@@ -8,8 +8,6 @@ export interface Props {
   style?: React.CSSProperties;
 }
 
-
-
 export interface Context {
   isEditMode: boolean;
 }
@@ -77,26 +75,26 @@ export class Layer extends React.Component<Props, State> {
     if (!this.layerDraggingMouseDelta) {
       return;
     }
+    const { matrix } = this.state;
+
     const newVector: Vector = [
-      evt.pageY - this.layerDraggingMouseDelta[1],
       evt.pageX - this.layerDraggingMouseDelta[0],
-      
+      evt.pageY - this.layerDraggingMouseDelta[1]
     ];
-    // TODO: Get x / y mouse delta
 
     this.setState({
-      matrix: this.matrixTranslate(this.state.matrix, newVector)
+      matrix: this.matrixTranslate(matrix, newVector)
     });
   }
 
   onMouseDown = (evt) => {
-    this.layerDraggingMouseDelta = [evt.pageX, evt.pageY];
+    this.layerDraggingMouseDelta = [evt.pageX - this.state.matrix[12], evt.pageY - this.state.matrix[13]];
   }
 
   matrixTranslate = (matrix: Matrix3d, vector: Vector) => {
     const newMatrix = [...matrix];
-    newMatrix[13] = vector[0];
-    newMatrix[14] = vector[1];
+    newMatrix[13] = vector[1];
+    newMatrix[12] = vector[0];
     return newMatrix as Matrix3d;
   }
 
