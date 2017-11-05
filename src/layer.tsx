@@ -1,10 +1,13 @@
+// https://bl.ocks.org/mbostock/10571478
+// http://franklinta.com/2014/09/08/computing-css-matrix3d-transforms/
+
 import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import { AnchorComponent } from './anchor';
+import { matrixToTransform, transformPointsToMatrix, vectorToTransform } from './util';
 
+// Component interfaces
 export interface Props {
-  height: number;
-  width: number;
   style?: React.CSSProperties;
 }
 
@@ -12,14 +15,23 @@ export interface Context {
   isEditMode: boolean;
 }
 
-export type Anchor = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export interface State {
+  matrix: Matrix3d;
+  translateDelta: { [key: string]: Vector };
+  sourcePoints?: RectPoints;
+  transformOrigin: Vector;
+  containerTranslate: Vector;
+}
 
 const styles = {
   container : {
-    position: 'relative' as 'relative'
+    position: 'relative' as 'relative',
+    cursor: 'all-scroll'
   }
 };
 
+// Sorted
+export type Anchor = 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left';
 const anchors: Anchor[] = [
   'top-left',
   'top-right',
@@ -35,11 +47,10 @@ export type Matrix3d = [
   number, number, number, number
 ];
 
-export type Vector = [number, number]; // [x, y]
+// top-left, top-right, bottom-right, bottom-left
+export type RectPoints = [Vector, Vector, Vector, Vector];
 
-export interface State {
-  matrix: Matrix3d;
-}
+export type Vector = [number, number]; // [x, y]
 
 const defaultMatrix: Matrix3d = [
   1, 0, 0, 0,
@@ -52,86 +63,139 @@ export class Layer extends React.Component<Props, State> {
   public static contextTypes = { isEditMode: PropTypes.bool };
 
   public context: Context;
+  container: HTMLElement | null;
 
-  layerDraggingMouseDelta: Vector | undefined;
+  layerTranslateDelta: Vector | undefined;
+  anchorTranslateDelta: Vector | undefined;
+
+  isAnchorDragging = false;
+
+  targetPoints: RectPoints;
 
   state: State = {
-    matrix: defaultMatrix
+    matrix: defaultMatrix,
+    translateDelta: anchors.reduce((acc, key) => (acc[key] = [0, 0], acc), {}),
+    sourcePoints: undefined,
+    transformOrigin: [0, 0],
+    containerTranslate: [0, 0]
   };
 
-  onAnchorMouseEnter = () => {};
+  componentDidMount() {
+    if (this.container) {
+      const { width, height } = this.container.getBoundingClientRect();
 
-  onAnchorMouseDown = () => {};
+      const sourcePoints = [
+        [0, 0],
+        [width, 0],
+        [width, height],
+        [0, height]
+      ] as RectPoints;
 
-  onAnchorMouseMove = () => {};
+      this.targetPoints = [...sourcePoints] as RectPoints;
+      this.setState({ sourcePoints });
 
-  onAnchorMouseUp = () => {};
-
-  onMouseUp = () => {
-    this.layerDraggingMouseDelta = undefined;
+    } else {
+      throw new Error('Couldn\'t get a reference of the container element');
+    }
   }
 
-  onMouseMove = (evt) => {
-    if (!this.layerDraggingMouseDelta) {
+  onAnchorMouseDown = (evt, position) => {
+    evt.stopPropagation();
+    this.anchorTranslateDelta = [evt.pageX, evt.pageY];    
+  }
+
+  onAnchorMouseMove = (evt, position) => {
+    if (!this.anchorTranslateDelta || !this.state.sourcePoints) {
       return;
     }
-    const { matrix } = this.state;
 
-    const newVector: Vector = [
-      evt.pageX - this.layerDraggingMouseDelta[0],
-      evt.pageY - this.layerDraggingMouseDelta[1]
+    evt.preventDefault();
+    evt.stopPropagation();
+    const vectorIndexToModify = anchors.indexOf(position);
+
+    const deltaX = (evt.pageX - this.anchorTranslateDelta[0]);
+    const deltaY = (evt.pageY - this.anchorTranslateDelta[1]);
+
+    this.targetPoints[vectorIndexToModify] = [
+      this.state.sourcePoints[vectorIndexToModify][0] + deltaX,
+      this.state.sourcePoints[vectorIndexToModify][1] + deltaY
     ];
 
     this.setState({
-      matrix: this.matrixTranslate(matrix, newVector)
+      matrix: transformPointsToMatrix(this.state.sourcePoints, this.targetPoints!),
+      translateDelta: { ...this.state.translateDelta, [position]: [deltaX, deltaY] }
+    });
+  }
+
+  onAnchorMouseUp = (position) => {
+    this.anchorTranslateDelta = undefined;
+  }
+
+  onMouseUp = () => {
+    this.layerTranslateDelta = undefined;
+  }
+
+  onMouseMove = (evt) => {
+    if (!this.layerTranslateDelta) {
+      return;
+    }
+
+    const newVector: Vector = [
+      evt.pageX - this.layerTranslateDelta[0],
+      evt.pageY - this.layerTranslateDelta[1]
+    ];
+
+    this.setState({
+      containerTranslate: newVector
     });
   }
 
   onMouseDown = (evt) => {
-    this.layerDraggingMouseDelta = [evt.pageX - this.state.matrix[12], evt.pageY - this.state.matrix[13]];
+    const { containerTranslate } = this.state;
+    this.layerTranslateDelta = [evt.pageX - containerTranslate[0], evt.pageY - containerTranslate[1]];
   }
-
-  matrixTranslate = (matrix: Matrix3d, vector: Vector) => {
-    const newMatrix = [...matrix];
-    newMatrix[13] = vector[1];
-    newMatrix[12] = vector[0];
-    return newMatrix as Matrix3d;
-  }
-
-  matrixToTransform = (matrix: Matrix3d) => (
-    `matrix3d(${matrix.join(', ')})`
-  )
 
   render() {
-    const { width, height, style } = this.props;
+    const { style } = this.props;
     const { isEditMode } = this.context;
+    const { translateDelta, matrix, containerTranslate, transformOrigin } = this.state;
 
     return (
     <div
-      onMouseDown={this.onMouseDown}
-      onMouseMove={this.onMouseMove}
-      onMouseUp={this.onMouseUp}
       style={{
-        ...styles.container,
-        ...style,
-        width,
-        height,
-        transform: this.matrixToTransform(this.state.matrix)
+        position: 'relative',
+        display: 'inline-block',
+        transform: vectorToTransform(containerTranslate)
       }}
     >
-      {isEditMode && <div>
-          {anchors.map(anchor => (
+      <div
+        ref={(ref) => { this.container = ref; }}
+        onMouseDown={this.onMouseDown}
+        onMouseMove={this.onMouseMove}
+        onMouseUp={this.onMouseUp}
+        style={{
+          ...styles.container,
+          ...style,
+          transform: matrixToTransform(matrix),
+          transformOrigin: `${transformOrigin[0]}px ${transformOrigin[1]}px 0px`
+        }}
+      >
+        {this.props.children}
+      </div>
+      {
+        isEditMode && <div>
+          {anchors.map((anchor, index) => (
             <AnchorComponent
               key={anchor}
+              translation={translateDelta[anchor]}
               position={anchor}
-              onMouseEnter={this.onAnchorMouseEnter}
               onMouseDown={this.onAnchorMouseDown}
               onMouseMove={this.onAnchorMouseMove}
               onMouseUp={this.onAnchorMouseUp}
             />
           ))}
-        </div>}
-      {this.props.children}
+        </div>
+      }
     </div>
     );
   }

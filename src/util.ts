@@ -1,30 +1,44 @@
-import { Vector, Matrix3d } from './layer';
-const solve = require('numeric');
+import { Matrix3d, RectPoints, Vector } from './layer';
+const { solve } = require('numeric');
 
-type RectPoints = [Vector, Vector, Vector, Vector];
+export const round = (num: number, precision: number) => {
+  var factor = Math.pow(10, precision);
+  var tempNumber = num * factor;
+  var roundedTempNumber = Math.round(tempNumber);
+  return roundedTempNumber / factor;
+};
 
-export const transformPointsToMatrix = (sourcePoints: RectPoints, targetPoints: RectPoints): Matrix3d => {
+export const transformPointsToMatrix = (
+  sourcePoints: RectPoints,
+  targetPoints: RectPoints
+): Matrix3d => {
   const a: number[][] = [];
   const b: number[] = [];
 
   for (let i = 0, n = sourcePoints.length; i < n; ++i) {
-    const [xSource, ySource] = sourcePoints[i];
-    const [xTarget, yTarget] = targetPoints[i];
+    const [fromX, fromY] = sourcePoints[i];
+    const [toX, toY] = targetPoints[i];
 
-    b.push(xTarget, yTarget);
-
-    a.push(
-      [xSource, ySource, 1, 0, 0, 0, - xSource * xTarget, - ySource * xTarget],
-      [0, 0, 0, xSource, ySource, 1, - xSource * yTarget, - ySource * yTarget]
-    );
+    a.push([fromX, fromY, 1, 0, 0, 0, - fromX * toX, - fromY * toX]);
+    b.push(toX);
+    a.push([0, 0, 0, fromX, fromY, 1, - fromX * toY, - fromY * toY]);
+    b.push(toY);
   }
 
-  const x = solve(a, b, true);
+  const h = solve(a, b, true);
 
   return [
-    x[0], x[3], 0, x[6],
-    x[1], x[4], 0, x[7],
-    0, 0, 1, 0,
-    x[2], x[5], 0, 1
-  ];
+    h[0], h[3], 0, h[6],
+    h[1], h[4], 0, h[7],
+    0,    0,    1, 0,
+    h[2], h[5], 0, 1
+  ].map(num => round(num, 10)) as Matrix3d;
 };
+
+export const matrixToTransform = (matrix: Matrix3d) => (
+  `matrix3d(${matrix.join(', ')})`
+);
+
+export const vectorToTransform = (vector: Vector) => (
+  `translate(${vector[0]}px, ${vector[1]}px)`
+);

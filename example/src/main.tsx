@@ -13,13 +13,11 @@ const styles = {
     backgroundColor: 'white'
   },
   editor: {
-    border: '1px solid red',
-    display: 'flex',
-    justifyContent: 'center' as 'center',
-    alignItems: 'center' as 'center'
+    border: '1px solid red'
   },
   layer: {
-    margin: 'auto'
+    width: 600,
+    height: 300
   }
 };
 
@@ -27,7 +25,7 @@ export default class Main extends React.Component {
   render() {
     return <div style={styles.container}>
         <Editor width="100vw" height="100vh" style={styles.editor} mode="edit">
-          <Layer width={500} height={270} style={styles.layer}>
+          <Layer style={styles.layer} x={100} y={40}>
             <div style={styles.rectExample} />
           </Layer>
         </Editor>
