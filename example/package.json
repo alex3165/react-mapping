@@ -29,6 +29,7 @@
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-key-handler": "^1.0.1",
     "react-youtube": "^7.5.0"
   }
 }

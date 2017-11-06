@@ -8,6 +8,9 @@ export const round = (num: number, precision: number) => {
   return roundedTempNumber / factor;
 };
 
+// tslint:disable-next-line:no-any
+export const range = (num: number) => (Array as any)(num).fill().map((_, i) => i * i);
+
 export const transformPointsToMatrix = (
   sourcePoints: RectPoints,
   targetPoints: RectPoints

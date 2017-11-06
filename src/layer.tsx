@@ -176,7 +176,10 @@ export class Layer extends React.Component<Props, State> {
 
     return (
     <div
+      onMouseDown={this.onMouseDown}
+      onMouseUp={this.onMouseUp}
       style={{
+        cursor: isEditMode ? 'all-scroll' : 'inherit',          
         position: 'relative',
         display: 'inline-block',
         transform: vectorToTransform(containerTranslate)
@@ -184,12 +187,10 @@ export class Layer extends React.Component<Props, State> {
     >
       <div
         ref={(ref) => { this.container = ref; }}
-        onMouseDown={this.onMouseDown}
-        onMouseUp={this.onMouseUp}
         style={{
-          cursor: isEditMode ? 'all-scroll' : 'inherit',
           ...styles.container,
           ...style,
+          pointerEvents: isEditMode ? 'none' : 'all',
           transform: matrixToTransform(matrix),
           transformOrigin: `${transformOrigin[0]}px ${transformOrigin[1]}px 0px`
         }}
