@@ -1,6 +1,3 @@
-// https://bl.ocks.org/mbostock/10571478
-// http://franklinta.com/2014/09/08/computing-css-matrix3d-transforms/
-
 import * as React from 'react';
 import { AnchorComponent } from './anchor';
 import { matrixToTransform, transformPointsToMatrix, vectorToTransform } from './util';
@@ -8,7 +5,12 @@ import { matrixToTransform, transformPointsToMatrix, vectorToTransform } from '.
 // Component interfaces
 export interface Props {
   style?: React.CSSProperties;
+  className?: string;
   isEditMode?: boolean;
+  x?: number;
+  y?: number;
+  anchorStyle?: React.CSSProperties;
+  anchorClassName?: string;
 }
 
 export interface Context {
@@ -74,11 +76,12 @@ export class Layer extends React.Component<Props, State> {
     translateDelta: anchors.reduce((acc, key) => (acc[key] = [0, 0], acc), {}),
     sourcePoints: undefined,
     transformOrigin: [0, 0],
-    containerTranslate: [0, 0]
+    containerTranslate: [this.props.x || 0, this.props.y || 0]
   };
 
   componentWillMount() {
     window.addEventListener('mousemove', this.onAnchorMouseMove);
+    window.addEventListener('mousemove', this.onMouseMove);
   }
 
   componentDidMount() {
@@ -102,6 +105,7 @@ export class Layer extends React.Component<Props, State> {
 
   componentWillUnmount() {
     window.removeEventListener('mousemove', this.onAnchorMouseMove);
+    window.removeEventListener('mousemove', this.onMouseMove);
   }
 
   onAnchorMouseDown = (evt, position) => {
@@ -167,7 +171,7 @@ export class Layer extends React.Component<Props, State> {
   }
 
   render() {
-    const { style, isEditMode } = this.props;
+    const { style, isEditMode, className, anchorStyle, anchorClassName } = this.props;
     const { translateDelta, matrix, containerTranslate, transformOrigin } = this.state;
 
     return (
@@ -181,7 +185,6 @@ export class Layer extends React.Component<Props, State> {
       <div
         ref={(ref) => { this.container = ref; }}
         onMouseDown={this.onMouseDown}
-        onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
         style={{
           cursor: isEditMode ? 'all-scroll' : 'inherit',
@@ -190,6 +193,7 @@ export class Layer extends React.Component<Props, State> {
           transform: matrixToTransform(matrix),
           transformOrigin: `${transformOrigin[0]}px ${transformOrigin[1]}px 0px`
         }}
+        className={className}
       >
         {this.props.children}
       </div>
@@ -197,6 +201,8 @@ export class Layer extends React.Component<Props, State> {
         isEditMode && <div>
           {anchors.map((anchor, index) => (
             <AnchorComponent
+              style={anchorStyle}
+              className={anchorClassName}
               key={anchor}
               translation={translateDelta[anchor]}
               position={anchor}

@@ -19,10 +19,12 @@ export const transformPointsToMatrix = (
     const [fromX, fromY] = sourcePoints[i];
     const [toX, toY] = targetPoints[i];
 
-    a.push([fromX, fromY, 1, 0, 0, 0, - fromX * toX, - fromY * toX]);
-    b.push(toX);
-    a.push([0, 0, 0, fromX, fromY, 1, - fromX * toY, - fromY * toY]);
-    b.push(toY);
+    a.push(
+      [fromX, fromY, 1, 0, 0, 0, - fromX * toX, - fromY * toX],
+      [0, 0, 0, fromX, fromY, 1, - fromX * toY, - fromY * toY]
+    );
+
+    b.push(toX, toY);
   }
 
   const h = solve(a, b, true);

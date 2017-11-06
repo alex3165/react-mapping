@@ -35,9 +35,12 @@ const styles = {
 export interface Props {
   position: Anchor;
   onMouseEnter?: (position: Anchor) => void;
+  // tslint:disable-next-line:no-any
   onMouseDown: (evt: any, position: Anchor) => void;
   onMouseUp: (position: Anchor) => void;
   translation: Vector;
+  style?: React.CSSProperties;
+  className?: string;
 }
 
 export const AnchorComponent: React.StatelessComponent<Props> = ({
@@ -45,15 +48,19 @@ export const AnchorComponent: React.StatelessComponent<Props> = ({
   translation,
   onMouseEnter,
   onMouseDown,
-  onMouseUp
+  onMouseUp,
+  className = '',
+  style = {}
 }) => (
   <div
     onMouseEnter={() => onMouseEnter && onMouseEnter(position)}
     onMouseDown={(evt) => onMouseDown(evt, position)}
     onMouseUp={() => onMouseUp(position)}
+    className={className}
     style={{
       ...styles.container,
       ...styles[position],
+      ...style,
       transform: vectorToTransform(translation)
     }}
   />
