@@ -2,13 +2,13 @@
 // http://franklinta.com/2014/09/08/computing-css-matrix3d-transforms/
 
 import * as React from 'react';
-import * as PropTypes from 'prop-types';
 import { AnchorComponent } from './anchor';
 import { matrixToTransform, transformPointsToMatrix, vectorToTransform } from './util';
 
 // Component interfaces
 export interface Props {
   style?: React.CSSProperties;
+  isEditMode?: boolean;
 }
 
 export interface Context {
@@ -25,8 +25,7 @@ export interface State {
 
 const styles = {
   container : {
-    position: 'relative' as 'relative',
-    cursor: 'all-scroll'
+    position: 'relative' as 'relative'
   }
 };
 
@@ -60,9 +59,6 @@ const defaultMatrix: Matrix3d = [
 ];
 
 export class Layer extends React.Component<Props, State> {
-  public static contextTypes = { isEditMode: PropTypes.bool };
-
-  public context: Context;
   container: HTMLElement | null;
 
   layerTranslateDelta: Vector | undefined;
@@ -71,6 +67,7 @@ export class Layer extends React.Component<Props, State> {
   isAnchorDragging = false;
 
   targetPoints: RectPoints;
+  anchorMoving: Anchor | undefined;
 
   state: State = {
     matrix: defaultMatrix,
@@ -79,6 +76,10 @@ export class Layer extends React.Component<Props, State> {
     transformOrigin: [0, 0],
     containerTranslate: [0, 0]
   };
+
+  componentWillMount() {
+    window.addEventListener('mousemove', this.onAnchorMouseMove);
+  }
 
   componentDidMount() {
     if (this.container) {
@@ -99,19 +100,28 @@ export class Layer extends React.Component<Props, State> {
     }
   }
 
-  onAnchorMouseDown = (evt, position) => {
-    evt.stopPropagation();
-    this.anchorTranslateDelta = [evt.pageX, evt.pageY];    
+  componentWillUnmount() {
+    window.removeEventListener('mousemove', this.onAnchorMouseMove);
   }
 
-  onAnchorMouseMove = (evt, position) => {
-    if (!this.anchorTranslateDelta || !this.state.sourcePoints) {
+  onAnchorMouseDown = (evt, position) => {
+    evt.stopPropagation();
+    this.anchorTranslateDelta = [
+      evt.pageX - this.state.translateDelta[position][0],
+      evt.pageY - this.state.translateDelta[position][1]
+    ];
+
+    this.anchorMoving = position;
+  }
+
+  onAnchorMouseMove = (evt) => {
+    if (!this.anchorTranslateDelta || !this.state.sourcePoints || !this.anchorMoving) {
       return;
     }
 
     evt.preventDefault();
     evt.stopPropagation();
-    const vectorIndexToModify = anchors.indexOf(position);
+    const vectorIndexToModify = anchors.indexOf(this.anchorMoving);
 
     const deltaX = (evt.pageX - this.anchorTranslateDelta[0]);
     const deltaY = (evt.pageY - this.anchorTranslateDelta[1]);
@@ -123,12 +133,13 @@ export class Layer extends React.Component<Props, State> {
 
     this.setState({
       matrix: transformPointsToMatrix(this.state.sourcePoints, this.targetPoints!),
-      translateDelta: { ...this.state.translateDelta, [position]: [deltaX, deltaY] }
+      translateDelta: { ...this.state.translateDelta, [this.anchorMoving]: [deltaX, deltaY] }
     });
   }
 
   onAnchorMouseUp = (position) => {
     this.anchorTranslateDelta = undefined;
+    this.anchorMoving = undefined;
   }
 
   onMouseUp = () => {
@@ -136,7 +147,7 @@ export class Layer extends React.Component<Props, State> {
   }
 
   onMouseMove = (evt) => {
-    if (!this.layerTranslateDelta) {
+    if (!this.layerTranslateDelta || !this.props.isEditMode) {
       return;
     }
 
@@ -156,8 +167,7 @@ export class Layer extends React.Component<Props, State> {
   }
 
   render() {
-    const { style } = this.props;
-    const { isEditMode } = this.context;
+    const { style, isEditMode } = this.props;
     const { translateDelta, matrix, containerTranslate, transformOrigin } = this.state;
 
     return (
@@ -174,6 +184,7 @@ export class Layer extends React.Component<Props, State> {
         onMouseMove={this.onMouseMove}
         onMouseUp={this.onMouseUp}
         style={{
+          cursor: isEditMode ? 'all-scroll' : 'inherit',
           ...styles.container,
           ...style,
           transform: matrixToTransform(matrix),
@@ -190,7 +201,6 @@ export class Layer extends React.Component<Props, State> {
               translation={translateDelta[anchor]}
               position={anchor}
               onMouseDown={this.onAnchorMouseDown}
-              onMouseMove={this.onAnchorMouseMove}
               onMouseUp={this.onAnchorMouseUp}
             />
           ))}

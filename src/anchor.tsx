@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Anchor, Vector } from './layer';
 import { vectorToTransform } from './util';
 
-const anchorSize = 30;
+const anchorSize = 20;
 const halfAnchor = anchorSize / 2;
 
 const styles = {
@@ -11,7 +11,7 @@ const styles = {
     height: anchorSize,
     borderRadius: '50%',
     position: 'absolute' as 'absolute',
-    backgroundColor: 'blue',
+    border: '2px solid white',
     cursor: 'pointer'
   },
   'top-left': {
@@ -36,7 +36,6 @@ export interface Props {
   position: Anchor;
   onMouseEnter?: (position: Anchor) => void;
   onMouseDown: (evt: any, position: Anchor) => void;
-  onMouseMove: (evt: any, position: Anchor) => void;
   onMouseUp: (position: Anchor) => void;
   translation: Vector;
 }
@@ -46,13 +45,11 @@ export const AnchorComponent: React.StatelessComponent<Props> = ({
   translation,
   onMouseEnter,
   onMouseDown,
-  onMouseMove,
   onMouseUp
 }) => (
   <div
     onMouseEnter={() => onMouseEnter && onMouseEnter(position)}
     onMouseDown={(evt) => onMouseDown(evt, position)}
-    onMouseMove={(evt) => onMouseMove(evt, position)}
     onMouseUp={() => onMouseUp(position)}
     style={{
       ...styles.container,

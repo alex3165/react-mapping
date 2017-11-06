@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Editor, Layer } from '../../';
+import { Layer } from '../../';
 
 const styles = {
   container: {
@@ -13,7 +13,8 @@ const styles = {
     backgroundColor: 'white'
   },
   editor: {
-    border: '1px solid red'
+    width: '100vw',
+    height: '100vh'
   },
   layer: {
     width: 600,
@@ -23,12 +24,12 @@ const styles = {
 
 export default class Main extends React.Component {
   render() {
-    return <div style={styles.container}>
-        <Editor width="100vw" height="100vh" style={styles.editor} mode="edit">
-          <Layer style={styles.layer} x={100} y={40}>
-            <div style={styles.rectExample} />
-          </Layer>
-        </Editor>
-      </div>;
+    return (
+    <div style={styles.container}>
+      <Layer style={styles.layer} x={100} y={40} isEditMode={true}>
+        <div style={styles.rectExample} />
+      </Layer>
+    </div>
+    );
   }
 }
