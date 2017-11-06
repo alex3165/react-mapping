@@ -1,5 +1,9 @@
 # React-mapping
-3D video mapping library for React.
+Video projection mapping library in React.
+
+Contain the following component:
+- Layer: Allow you to transform the children element as you wish (3d tranform and translate)
+- Grid: Add a background grid to help with accuracy
 
 ## Documentation
 TBD
@@ -7,16 +11,13 @@ TBD
 ## TODO
 
 ### Layer
-- Handle resize
-- Add background grid
 - Add layer grid
 - Add magnet
 
 - Add reset functionality
 - Write documentation
-- Add key controls
+- Add more key controls
 - Add save to localstorage
-- Prevent element interaction on edit mode
 - Add layer container style when selecting a layer
 
 
