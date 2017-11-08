@@ -17,12 +17,12 @@ const styles = {
   row: {
     height: 1,
     backgroundColor: 'white',
-    opacity: .3
+    opacity: 0.3
   },
   column: {
     width: 1,
     backgroundColor: 'white',
-    opacity: .3
+    opacity: 0.3
   },
   item: {
     position: 'absolute' as 'absolute',
@@ -34,7 +34,6 @@ const styles = {
 };
 
 export class Grid extends React.Component<Props> {
-
   public static defaultProps = {
     rows: 20,
     columns: 32
@@ -45,25 +44,18 @@ export class Grid extends React.Component<Props> {
 
     return (
       <div style={styles.container}>
-        <div style={{ ...styles.item, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          {
-            range(rows!).map((i) => (
-              <div
-                key={i}
-                style={styles.row}
-              />
-            ))
-          }
+        <div
+          style={{
+            ...styles.item,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between'
+          }}
+        >
+          {range(rows!).map(i => <div key={i} style={styles.row} />)}
         </div>
         <div style={{ ...styles.item, display: 'flex', justifyContent: 'space-between' }}>
-          {
-            range(columns!).map((i) => (
-              <div
-                key={i}
-                style={styles.column}
-              />
-            ))
-          }
+          {range(columns!).map(i => <div key={i} style={styles.column} />)}
         </div>
       </div>
     );

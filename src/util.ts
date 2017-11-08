@@ -9,7 +9,10 @@ export const round = (num: number, precision: number) => {
 };
 
 // tslint:disable-next-line:no-any
-export const range = (num: number) => (Array as any)(num).fill().map((_, i) => i * i);
+export const range = (num: number) =>
+  (Array as any)(num)
+    .fill()
+    .map((_, i) => i * i);
 
 export const transformPointsToMatrix = (
   sourcePoints: RectPoints,
@@ -23,8 +26,8 @@ export const transformPointsToMatrix = (
     const [toX, toY] = targetPoints[i];
 
     a.push(
-      [fromX, fromY, 1, 0, 0, 0, - fromX * toX, - fromY * toX],
-      [0, 0, 0, fromX, fromY, 1, - fromX * toY, - fromY * toY]
+      [fromX, fromY, 1, 0, 0, 0, -fromX * toX, -fromY * toX],
+      [0, 0, 0, fromX, fromY, 1, -fromX * toY, -fromY * toY]
     );
 
     b.push(toX, toY);
@@ -32,18 +35,11 @@ export const transformPointsToMatrix = (
 
   const h = solve(a, b, true);
 
-  return [
-    h[0], h[3], 0, h[6],
-    h[1], h[4], 0, h[7],
-    0,    0,    1, 0,
-    h[2], h[5], 0, 1
-  ].map(num => round(num, 10)) as Matrix3d;
+  return [h[0], h[3], 0, h[6], h[1], h[4], 0, h[7], 0, 0, 1, 0, h[2], h[5], 0, 1].map(num =>
+    round(num, 10)
+  ) as Matrix3d;
 };
 
-export const matrixToTransform = (matrix: Matrix3d) => (
-  `matrix3d(${matrix.join(', ')})`
-);
+export const matrixToTransform = (matrix: Matrix3d) => `matrix3d(${matrix.join(', ')})`;
 
-export const vectorToTransform = (vector: Vector) => (
-  `translate(${vector[0]}px, ${vector[1]}px)`
-);
+export const vectorToTransform = (vector: Vector) => `translate(${vector[0]}px, ${vector[1]}px)`;

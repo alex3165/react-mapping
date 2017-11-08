@@ -15,20 +15,20 @@ const styles = {
     cursor: 'pointer'
   },
   'top-left': {
-    left: - halfAnchor,
-    top: - halfAnchor
+    left: -halfAnchor,
+    top: -halfAnchor
   },
   'bottom-left': {
-    left: - halfAnchor,
-    bottom: - halfAnchor
+    left: -halfAnchor,
+    bottom: -halfAnchor
   },
   'top-right': {
-    top: - halfAnchor,
-    right: - halfAnchor
+    top: -halfAnchor,
+    right: -halfAnchor
   },
   'bottom-right': {
-    bottom: - halfAnchor,
-    right: - halfAnchor
+    bottom: -halfAnchor,
+    right: -halfAnchor
   }
 };
 
@@ -54,7 +54,7 @@ export const AnchorComponent: React.StatelessComponent<Props> = ({
 }) => (
   <div
     onMouseEnter={() => onMouseEnter && onMouseEnter(position)}
-    onMouseDown={(evt) => onMouseDown(evt, position)}
+    onMouseDown={evt => onMouseDown(evt, position)}
     onMouseUp={() => onMouseUp(position)}
     className={className}
     style={{

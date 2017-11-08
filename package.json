@@ -1,17 +1,20 @@
 {
   "name": "react-mapping",
   "version": "1.0.0",
-  "description": "",
+  "description": "A react library for projection mapping",
   "main": "build/index.js",
+  "typings": "build/index.d.ts",
   "scripts": {
     "clean": "rm -rf ./build",
     "build": "tsc",
     "build:watch": "tsc -w",
-    "prepublish": "npm run clean && npm run build",
+    "prepublishOnly": "npm run clean && npm run build",
+    "version": "npm run build",    
     "lint": "tslint 'src/**/*.{ts,tsx}'",
+    "postversion": "git push && git push --tags",
     "prettify": "prettier --write src/*.ts src/*.tsx src/**/*.ts src/**/*.tsx"
   },
-  "author": "",
+  "author": "Alexandre Rieux",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^8.0.47",
@@ -28,5 +31,27 @@
     "numeric": "^1.2.6",
     "prop-types": "^15.6.0",
     "react": "^16.0.0"
-  }
+  },
+  "files": [
+    "build",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex3165/react-mapping.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alex3165/react-mapping/issues"
+  },
+  "homepage": "https://github.com/alex3165/react-mapping#readme",
+  "keywords": [
+    "projection mapping",
+    "mapping",
+    "video mapping",
+    "react",
+    "component",
+    "react-component",
+    "3d transform",
+    "matrix3d"
+  ]
 }

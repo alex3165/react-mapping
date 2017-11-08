@@ -47,7 +47,6 @@ Allow you to transform and translate any React child component
 - Add magnet
 
 - Add reset functionality
-- Write documentation
 - Add more key controls
 - Add save to localstorage
 - Add layer container style when selecting a layer
