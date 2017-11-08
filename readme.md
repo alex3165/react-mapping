@@ -5,8 +5,40 @@ Contain the following component:
 - Layer: Allow you to transform the children element as you wish (3d tranform and translate)
 - Grid: Add a background grid to help with accuracy
 
-## Documentation
-TBD
+# Documentation
+
+## Layer
+
+Allow you to transform and translate any React child component
+
+### How to use
+```jsx
+  <Layer isEditMode={true}>
+    <video src="A_VIDEO_SOURCE" style={{ width: 640, height: 390 }}/>
+  </Layer>
+```
+
+### Properties
+- **style** : `React.CSSProperties` Style applied to the container of the children element
+- **anchorStyle** : `React.CSSProperties` Style applied to the anchor component
+- **className** : `string` Classes applied to the container of the children element
+- **anchorClassName** : `string` Classes applied to the anchor component
+- **isEditMode** : `boolean` if true, switch to edit mode and make anchors visible, if false, switch to view mode and anchor are not visible.
+- **x** : `number` Initial x position of the child element
+- **y** : `number` Initial y position of the child element
+
+------
+## Grid
+
+### How to use
+```jsx
+  <Grid/>
+```
+
+### Properties
+- **rows** : `number` number of rows to display
+- **columns** : `number` number of columns to display
+
 
 ## TODO
 
