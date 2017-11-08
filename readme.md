@@ -3,13 +3,15 @@ Video projection mapping library in React.
 
 Contain the following component:
 - Layer: Allow you to transform the children element as you wish (3d tranform and translate)
-- Grid: Add a background grid to help with accuracy
+- Grid: Add a background grid to help with accuracy while you are mapping in edit mode
+
+This is a work in progress library.
 
 # Documentation
 
 ## Layer
 
-Allow you to transform and translate any React child component
+Allow you to transform the children element as you wish (3d tranform and translate)
 
 ### How to use
 ```jsx
