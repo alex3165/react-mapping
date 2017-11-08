@@ -53,9 +53,6 @@ Allow you to transform the children element as you wish (3d tranform and transla
 - Add save to localstorage
 - Add layer container style when selecting a layer
 
-
-- Add the library to http://tangiblejs.com/
-
 ## Thanks
 
 This library has been inspired from the following blog posts / library:
